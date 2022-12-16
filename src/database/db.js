@@ -4,7 +4,7 @@ dotenv.config();
 
 const connectionDB = new pg.Pool({
     connectionString: process.env.DATABASE_URL,
-    ssl: true,
+    // ssl: true,
 });
 
 export default connectionDB;
