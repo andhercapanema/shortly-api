@@ -12,7 +12,8 @@ const UsersRepository = {
     },
     insertNewUser: async ({ name, email, password }) => {
         await connectionDB.query(
-            `INSERT INTO users (name, email, password)
+            `INSERT INTO users
+            (name, email, password)
             VALUES ($1, $2, $3);`,
             [name, email, password]
         );
