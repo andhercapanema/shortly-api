@@ -9,6 +9,15 @@ const UrlsRepository = {
             [userId, shortUrl, longUrl]
         );
     },
+    selectUrlById: async (id) => {
+        const shortUrl = await connectionDB.query(
+            `SELECT id, short_url AS "shortUrl", url
+            FROM urls
+            WHERE id = $1;`,
+            [id]
+        );
+        return shortUrl.rows[0];
+    },
 };
 
 export default UrlsRepository;

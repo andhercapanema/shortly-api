@@ -9,7 +9,7 @@ const SessionsRepository = {
             [userId, token]
         );
     },
-    getSessionByUserId: async (userId) => {
+    selectSessionByUserId: async (userId) => {
         const session = await connectionDB.query(
             `SELECT *
             FROM sessions
@@ -26,7 +26,7 @@ const SessionsRepository = {
             [userId]
         );
     },
-    getSessionByToken: async (token) => {
+    selectSessionByToken: async (token) => {
         const session = await connectionDB.query(
             `SELECT *
             FROM sessions

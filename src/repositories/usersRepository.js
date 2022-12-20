@@ -1,7 +1,7 @@
 import connectionDB from "../database/db.js";
 
 const UsersRepository = {
-    getUserByEmail: async (email) => {
+    selectUserByEmail: async (email) => {
         const user = await connectionDB.query(
             `SELECT *
             FROM users

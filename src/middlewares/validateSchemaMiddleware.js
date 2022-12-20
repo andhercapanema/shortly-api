@@ -1,5 +1,5 @@
 import { signUpSchema, signInSchema } from "../models/loginModels.js";
-import urlSchema from "../models/urlsModels.js";
+import { urlSchema } from "../models/urlsModels.js";
 
 export default async function schemaValidation(req, res, next) {
     const handleRoute = {

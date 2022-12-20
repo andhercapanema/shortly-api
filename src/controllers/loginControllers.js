@@ -3,8 +3,8 @@ import bcrypt from "bcrypt";
 import SessionsRepository from "../repositories/sessionsRepository.js";
 import { v4 as uuid } from "uuid";
 
-const { getUserByEmail, insertNewUser } = UsersRepository;
-const { insertNewSession, getSessionByUserId, deleteSessionByUserId } =
+const { selectUserByEmail, insertNewUser } = UsersRepository;
+const { insertNewSession, selectSessionByUserId, deleteSessionByUserId } =
     SessionsRepository;
 
 export async function signUp(req, res) {
@@ -17,7 +17,7 @@ export async function signUp(req, res) {
             .send({ message: "As senhas inseridas são diferentes!" });
 
     try {
-        const isNewEmail = (await getUserByEmail(email)) === undefined;
+        const isNewEmail = (await selectUserByEmail(email)) === undefined;
 
         if (!isNewEmail)
             return res.status(409).send({
@@ -41,7 +41,7 @@ export async function signIn(req, res) {
     const { email, password } = res.locals.validatedBody;
 
     try {
-        const user = await getUserByEmail(email);
+        const user = await selectUserByEmail(email);
 
         if (user === undefined || !bcrypt.compareSync(password, user.password))
             return res.status(401).send({
@@ -49,7 +49,7 @@ export async function signIn(req, res) {
                     "Nenhum usuário está cadastrado com esse e-mail ou a senha inserida está incorreta!",
             });
 
-        /* const session = await getSessionByUserId(user.id);
+        /* const session = await selectSessionByUserId(user.id);
         if (session !== undefined) await deleteSessionByUserId(user.id); */
 
         await deleteSessionByUserId(user.id);
