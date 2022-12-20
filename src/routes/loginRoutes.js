@@ -4,9 +4,7 @@ import schemaValidation from "../middlewares/validateSchemaMiddlewares.js";
 
 const router = Router();
 
-router.use(schemaValidation);
-
-router.post("/signup", signUp);
-router.post("/signin", signIn);
+router.post("/signup", schemaValidation, signUp);
+router.post("/signin", schemaValidation, signIn);
 
 export default router;
