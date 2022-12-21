@@ -1,5 +1,5 @@
 import { signUpSchema, signInSchema } from "../models/loginModels.js";
-import { urlSchema } from "../models/urlsModels.js";
+import { urlIdSchema, urlSchema } from "../models/urlsModels.js";
 
 export default async function schemaValidation(req, res, next) {
     const handleRoute = {
@@ -19,15 +19,21 @@ export default async function schemaValidation(req, res, next) {
             },
             schema: signInSchema,
         },
-        "/urls/shorten": {
+        "/shorten": {
             body: {
                 url: req.body.url,
             },
             schema: urlSchema,
         },
+        "/:id": {
+            body: {
+                id: req.params.id,
+            },
+            schema: urlIdSchema,
+        },
     };
 
-    const { body, schema } = handleRoute[req.originalUrl];
+    const { body, schema } = handleRoute[req.route.path];
 
     const { value, error } = schema.validate(body, {
         abortEarly: false,

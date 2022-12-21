@@ -7,7 +7,7 @@ export default async function getMyUrls(req, res) {
     } = res.locals;
 
     try {
-        const user = await UsersRepository.sumUrlVisitCountByUserId(user_id);
+        const user = await UsersRepository.selectUserById(user_id);
 
         if (user === undefined)
             return res.status(404).send({
@@ -17,8 +17,21 @@ export default async function getMyUrls(req, res) {
 
         const userUrls = await UrlsRepository.selectUrlsInfosByUserId(user_id);
 
+        if (userUrls.length === 0) {
+            const { id, name } = user;
+            return res.send({
+                id,
+                name,
+                visitCount: 0,
+                shortenedUrls: [...userUrls],
+            });
+        }
+
+        const userSumVisitsCount =
+            await UsersRepository.sumUrlVisitsCountByUserId(user_id);
+
         res.send({
-            ...user,
+            ...userSumVisitsCount,
             shortenedUrls: [...userUrls],
         });
     } catch (err) {

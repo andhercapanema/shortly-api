@@ -18,7 +18,7 @@ const UsersRepository = {
             [name, email, password]
         );
     },
-    sumUrlVisitCountByUserId: async (id) => {
+    sumUrlVisitsCountByUserId: async (id) => {
         const user = await connectionDB.query(
             `SELECT us.id, us.name, SUM(ur.visits_count) AS "visitCount"
             FROM users AS us
@@ -26,6 +26,15 @@ const UsersRepository = {
             ON us.id = ur.user_id
             WHERE us.id = $1
             GROUP BY us.id, us.name;`,
+            [id]
+        );
+        return user.rows[0];
+    },
+    selectUserById: async (id) => {
+        const user = await connectionDB.query(
+            `SELECT *
+            FROM users
+            WHERE id = $1;`,
             [id]
         );
         return user.rows[0];
