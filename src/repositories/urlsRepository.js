@@ -11,7 +11,7 @@ const UrlsRepository = {
     },
     selectUrlById: async (id) => {
         const shortUrl = await connectionDB.query(
-            `SELECT id, short_url AS "shortUrl", url
+            `SELECT *
             FROM urls
             WHERE id = $1;`,
             [id]
@@ -33,6 +33,13 @@ const UrlsRepository = {
             SET visits_count = $1
             WHERE id = $2;`,
             [amount, id]
+        );
+    },
+    deleteUrlFromDb: async (id) => {
+        await connectionDB.query(
+            `DELETE FROM urls
+            WHERE id = $1;`,
+            [id]
         );
     },
 };

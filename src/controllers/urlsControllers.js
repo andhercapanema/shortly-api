@@ -2,37 +2,18 @@ import SessionsRepository from "../repositories/sessionsRepository.js";
 import { nanoid } from "nanoid";
 import UrlsRepository from "../repositories/urlsRepository.js";
 
-const {
-    insertNewUrl,
-    selectUrlById,
-    selectUrlByShortUrl,
-    increaseVisitsCount,
-} = UrlsRepository;
+const { insertNewUrl, increaseVisitsCount, deleteUrlFromDb } = UrlsRepository;
 
 export async function shortenUrl(req, res) {
-    const { authorization } = req.headers;
-    const token = authorization?.replace("Bearer ", "");
+    const {
+        session: { user_id },
+    } = res.locals;
     let { url } = res.locals.validatedBody;
-
-    if (token === undefined)
-        return res
-            .status(401)
-            .send({ message: "Authorization header não enviado!" });
+    const longUrl = url;
+    url = nanoid();
 
     try {
-        const session = await SessionsRepository.selectSessionByToken(token);
-
-        if (session === undefined)
-            return res.status(401).send({
-                message:
-                    "Authorization header enviado não corresponde a nenhum usuário logado!",
-            });
-
-        const longUrl = url;
-        url = nanoid();
-
-        await insertNewUrl(session.user_id, url, longUrl);
-
+        await insertNewUrl(user_id, url, longUrl);
         res.status(201).send({ shortUrl: url });
     } catch (err) {
         console.error(err);
@@ -41,18 +22,12 @@ export async function shortenUrl(req, res) {
 }
 
 export async function getUrlById(req, res) {
-    const { id } = res.locals;
+    const {
+        selectedUrl: { id, short_url, url },
+    } = res.locals;
 
     try {
-        const shortUrl = await selectUrlById(id);
-
-        if (shortUrl === undefined)
-            return res.status(404).send({
-                message:
-                    "Nenhuma URL encurtada foi encontrada com esse id, favor inserir outro!",
-            });
-
-        res.send(shortUrl);
+        res.send({ id, shortUrl: short_url, url });
     } catch (err) {
         console.error(err);
         res.status(500).send(err.message);
@@ -60,22 +35,25 @@ export async function getUrlById(req, res) {
 }
 
 export async function openUrl(req, res) {
-    const { shortUrl } = req.params;
+    const {
+        selectedUrl: { id, url, visits_count },
+    } = res.locals;
 
     try {
-        const selectedUrl = await selectUrlByShortUrl(shortUrl);
-
-        if (selectedUrl === undefined)
-            return res.status(404).send({
-                message:
-                    "Não existe nenhuma URL cadastrada com esse código, favor inserir outro!",
-            });
-
-        const { id, url, visits_count } = selectedUrl;
-
         await increaseVisitsCount(visits_count + 1, id);
-
         res.redirect(url);
+    } catch (err) {
+        console.error(err);
+        res.status(500).send(err.message);
+    }
+}
+
+export async function deleteUrl(req, res) {
+    const { id } = req.params;
+
+    try {
+        await deleteUrlFromDb(id);
+        res.sendStatus(204);
     } catch (err) {
         console.error(err);
         res.status(500).send(err.message);
