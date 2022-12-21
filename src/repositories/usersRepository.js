@@ -39,6 +39,25 @@ const UsersRepository = {
         );
         return user.rows[0];
     },
+    selectMostVisitedUsers: async () => {
+        const mostVisitedUrls = await connectionDB.query(
+            `SELECT 
+                us.id,
+                us.name,
+                COUNT(ur.id) AS "linksCount",
+                COALESCE(
+                    SUM(ur.visits_count),
+                    0
+                ) AS "visitCount"
+            FROM users AS us
+            LEFT JOIN urls AS ur
+            ON us.id = ur.user_id
+            GROUP BY us.id
+            ORDER BY "visitCount" DESC
+            LIMIT 10;`
+        );
+        return mostVisitedUrls.rows;
+    },
 };
 
 export default UsersRepository;

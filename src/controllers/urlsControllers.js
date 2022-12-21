@@ -1,6 +1,6 @@
-import SessionsRepository from "../repositories/sessionsRepository.js";
 import { nanoid } from "nanoid";
 import UrlsRepository from "../repositories/urlsRepository.js";
+import UsersRepository from "../repositories/usersRepository.js";
 
 const { insertNewUrl, increaseVisitsCount, deleteUrlFromDb } = UrlsRepository;
 
@@ -54,6 +54,16 @@ export async function deleteUrl(req, res) {
     try {
         await deleteUrlFromDb(id);
         res.sendStatus(204);
+    } catch (err) {
+        console.error(err);
+        res.status(500).send(err.message);
+    }
+}
+
+export async function getMostVisitedUrls(req, res) {
+    try {
+        const mostVisitedUrls = await UsersRepository.selectMostVisitedUsers();
+        res.send(mostVisitedUrls);
     } catch (err) {
         console.error(err);
         res.status(500).send(err.message);
