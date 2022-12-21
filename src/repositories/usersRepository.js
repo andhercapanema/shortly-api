@@ -20,21 +20,18 @@ const UsersRepository = {
     },
     sumUrlVisitsCountByUserId: async (id) => {
         const user = await connectionDB.query(
-            `SELECT us.id, us.name, SUM(ur.visits_count) AS "visitCount"
+            `SELECT
+                us.id,
+                us.name,
+                COALESCE(
+                    SUM(ur.visits_count),
+                    0
+                ) AS "visitCount"
             FROM users AS us
-            JOIN urls AS ur
+            LEFT JOIN urls AS ur
             ON us.id = ur.user_id
             WHERE us.id = $1
             GROUP BY us.id, us.name;`,
-            [id]
-        );
-        return user.rows[0];
-    },
-    selectUserById: async (id) => {
-        const user = await connectionDB.query(
-            `SELECT *
-            FROM users
-            WHERE id = $1;`,
             [id]
         );
         return user.rows[0];

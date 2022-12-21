@@ -7,28 +7,16 @@ export default async function getMyUrls(req, res) {
     } = res.locals;
 
     try {
-        const user = await UsersRepository.selectUserById(user_id);
+        const userSumVisitsCount =
+            await UsersRepository.sumUrlVisitsCountByUserId(user_id);
 
-        if (user === undefined)
+        if (userSumVisitsCount === undefined)
             return res.status(404).send({
                 message:
                     "O usuário correspondente a esse token não existe mais!",
             });
 
         const userUrls = await UrlsRepository.selectUrlsInfosByUserId(user_id);
-
-        if (userUrls.length === 0) {
-            const { id, name } = user;
-            return res.send({
-                id,
-                name,
-                visitCount: 0,
-                shortenedUrls: [...userUrls],
-            });
-        }
-
-        const userSumVisitsCount =
-            await UsersRepository.sumUrlVisitsCountByUserId(user_id);
 
         res.send({
             ...userSumVisitsCount,
