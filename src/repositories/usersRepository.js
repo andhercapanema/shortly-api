@@ -18,6 +18,18 @@ const UsersRepository = {
             [name, email, password]
         );
     },
+    sumUrlVisitCountByUserId: async (id) => {
+        const user = await connectionDB.query(
+            `SELECT us.id, us.name, SUM(ur.visits_count) AS "visitCount"
+            FROM users AS us
+            JOIN urls AS ur
+            ON us.id = ur.user_id
+            WHERE us.id = $1
+            GROUP BY us.id, us.name;`,
+            [id]
+        );
+        return user.rows[0];
+    },
 };
 
 export default UsersRepository;

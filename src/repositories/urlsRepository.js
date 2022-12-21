@@ -42,6 +42,15 @@ const UrlsRepository = {
             [id]
         );
     },
+    selectUrlsInfosByUserId: async (userId) => {
+        const urls = await connectionDB.query(
+            `SELECT id, short_url AS "shortUrl", url, visits_count AS "visitCount"
+            FROM urls
+            WHERE user_id = $1;`,
+            [userId]
+        );
+        return urls.rows;
+    },
 };
 
 export default UrlsRepository;
