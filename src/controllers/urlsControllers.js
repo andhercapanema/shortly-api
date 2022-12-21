@@ -2,7 +2,12 @@ import SessionsRepository from "../repositories/sessionsRepository.js";
 import { nanoid } from "nanoid";
 import UrlsRepository from "../repositories/urlsRepository.js";
 
-const { insertNewUrl, selectUrlById } = UrlsRepository;
+const {
+    insertNewUrl,
+    selectUrlById,
+    selectUrlByShortUrl,
+    increaseVisitsCount,
+} = UrlsRepository;
 
 export async function shortenUrl(req, res) {
     const { authorization } = req.headers;
@@ -36,7 +41,7 @@ export async function shortenUrl(req, res) {
 }
 
 export async function getUrlById(req, res) {
-    const { id } = req.params;
+    const { id } = res.locals;
 
     try {
         const shortUrl = await selectUrlById(id);
@@ -44,10 +49,33 @@ export async function getUrlById(req, res) {
         if (shortUrl === undefined)
             return res.status(404).send({
                 message:
-                    "Nenhuma url encurtada foi encontrada com esse id, favor inserir outro!",
+                    "Nenhuma URL encurtada foi encontrada com esse id, favor inserir outro!",
             });
 
         res.send(shortUrl);
+    } catch (err) {
+        console.error(err);
+        res.status(500).send(err.message);
+    }
+}
+
+export async function openUrl(req, res) {
+    const { shortUrl } = req.params;
+
+    try {
+        const selectedUrl = await selectUrlByShortUrl(shortUrl);
+
+        if (selectedUrl === undefined)
+            return res.status(404).send({
+                message:
+                    "Não existe nenhuma URL cadastrada com esse código, favor inserir outro!",
+            });
+
+        const { id, url, visits_count } = selectedUrl;
+
+        await increaseVisitsCount(visits_count + 1, id);
+
+        res.redirect(url);
     } catch (err) {
         console.error(err);
         res.status(500).send(err.message);

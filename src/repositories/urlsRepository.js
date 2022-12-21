@@ -18,6 +18,23 @@ const UrlsRepository = {
         );
         return shortUrl.rows[0];
     },
+    selectUrlByShortUrl: async (shortUrl) => {
+        const url = await connectionDB.query(
+            `SELECT *
+            FROM urls
+            WHERE short_url = $1;`,
+            [shortUrl]
+        );
+        return url.rows[0];
+    },
+    increaseVisitsCount: async (amount, id) => {
+        await connectionDB.query(
+            `UPDATE urls
+            SET visits_count = $1
+            WHERE id = $2;`,
+            [amount, id]
+        );
+    },
 };
 
 export default UrlsRepository;
