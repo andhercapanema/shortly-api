@@ -23,11 +23,11 @@ export async function shortenUrl(req, res) {
 
 export async function getUrlById(req, res) {
     const {
-        selectedUrl: { id, short_url, url },
+        selectedUrl: { id, short_url, long_url },
     } = res.locals;
 
     try {
-        res.send({ id, shortUrl: short_url, url });
+        res.send({ id, shortUrl: short_url, url: long_url });
     } catch (err) {
         console.error(err);
         res.status(500).send(err.message);
@@ -36,12 +36,12 @@ export async function getUrlById(req, res) {
 
 export async function openUrl(req, res) {
     const {
-        selectedUrl: { id, url, visits_count },
+        selectedUrl: { id, long_url, visits_count },
     } = res.locals;
 
     try {
         await increaseVisitsCount(visits_count + 1, id);
-        res.redirect(url);
+        return res.redirect(200, long_url);
     } catch (err) {
         console.error(err);
         res.status(500).send(err.message);

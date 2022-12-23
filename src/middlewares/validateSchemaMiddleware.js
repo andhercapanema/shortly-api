@@ -42,7 +42,7 @@ export default async function schemaValidation(req, res, next) {
     if (error !== undefined)
         return res
             .status(422)
-            .send(error.details.map((detail) => detail.message));
+            .send({ message: error.details.map((detail) => detail.message) });
 
     res.locals.validatedBody = value;
 

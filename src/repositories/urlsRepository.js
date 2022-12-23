@@ -4,7 +4,7 @@ const UrlsRepository = {
     insertNewUrl: async (userId, shortUrl, longUrl) => {
         await connectionDB.query(
             `INSERT INTO urls
-            (user_id, short_url, url)
+            (user_id, short_url, long_url)
             VALUES ($1, $2, $3);`,
             [userId, shortUrl, longUrl]
         );
@@ -44,9 +44,10 @@ const UrlsRepository = {
     },
     selectUrlsInfosByUserId: async (userId) => {
         const urls = await connectionDB.query(
-            `SELECT id, short_url AS "shortUrl", url, visits_count AS "visitCount"
+            `SELECT id, short_url AS "shortUrl", long_url AS url, visits_count AS "visitCount"
             FROM urls
-            WHERE user_id = $1;`,
+            WHERE user_id = $1
+            ORDER BY id;`,
             [userId]
         );
         return urls.rows;
